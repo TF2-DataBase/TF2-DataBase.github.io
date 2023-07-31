@@ -1,0 +1,591 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-16">
+    <meta name="viewport" content="width=device-width, initial-scale=0.75, maximum-scale=0.75, user-scalable=0">
+    <title>TF2 database: cheaters</title>
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+<script type="text/javascript">
+var network;
+    function main() {
+    
+var nodes = new vis.DataSet([
+{ id: "69", 
+    id3: "0",
+    id1: "0",
+    label: "roadblocks",
+    borderWidthSelected: 3,
+    shape: "star",
+    
+    color: {
+        border: "#00ffff",
+        background: "#00ffff",
+        highlight: {
+            border: "#00ffff",
+            background: "#008888",
+        },
+    }, 
+    x: 69, y: 69,
+    aliases: ["roadblocks"]},
+    { id: "76561198989830356", 
+    id3: "[U:1:1029564628]",
+    id1: "STEAM_0:0:514782314",
+    label: "Sulkan/Honey Bee",
+    borderWidthSelected: 3,
+    shape: "star",
+    
+    color: {
+        border: "#00ffff",
+        background: "#00ffff",
+        highlight: {
+            border: "#00ffff",
+            background: "#008888",
+        },
+    }, 
+    x: 0, y: 0,
+    aliases: ["honeybee[WebMoneyINC]"]
+},
+{ id: "76561199482717511", 
+    id3: "[U:1:1522451783]",
+    id1: "STEAM_0:1:761225891",
+    label: "Queecore/qt",
+    borderWidthSelected: 3,
+    shape: "star",
+    
+    color: {
+        border: "#00ffff",
+        background: "#00ffff",
+        highlight: {
+            border: "#00ffff",
+            background: "#008888",
+        },
+    }, 
+    x: 55, y: 0,
+    aliases: ["✧˖°. ♡ queecore"]
+},
+]);
+
+var edges = new vis.DataSet([]); //i think it needs this
+
+
+    // create a network
+    var container = document.getElementById("mynetwork");
+    var data = {
+      nodes: nodes,
+      edges: edges
+    };
+    var options = {
+      layout: {
+        randomSeed: 0,
+        //clusterThreshold: 25
+      },
+      interaction: {
+        hideEdgesOnZoom: true,
+        hideEdgesOnDrag: true,
+        selectConnectedEdges: false
+      },
+      nodes: {
+        shape: "square",
+        size: 10,
+        font: {
+          face: 'courier new',
+          size: 6,
+          color: '#ffffff',
+          strokeWidth: 0.5,
+          strokeColor: '#000000'
+        }
+      },
+      edges: {
+        width: 1.25,
+        selectionWidth: 4,
+        smooth: false
+      },
+      physics: {
+        enabled: false,
+        solver: 'forceAtlas2Based',
+        forceAtlas2Based: {
+          avoidOverlap: 0.2
+        },
+        stabilization: {
+          updateInterval: 10,
+          iterations: 500
+        },
+      }
+    };
+    network = new vis.Network(container, data, options);
+    // Update progress bar
+    network.on("stabilizationProgress", function (params) {
+      document.getElementById("loadingbar").setAttribute('value', (10000 * params.iterations) / params.total);
+    });
+    // Disable progress bar after load
+    network.on("stabilizationIterationsDone", function (params) {
+      document.getElementById("loadingbar").style.display = 'none';
+      document.getElementById('infodiv').style.display = 'none';
+    });
+    // Disable selecting edges
+    network.on('click', handleSelect);
+    network.on('dragStart', handleDrag);
+    network.on('dragEnd', handleDragEnd);
+    network.on('oncontext', (event) => {
+      event.event.preventDefault();
+      if(lastSelectedNode === undefined) {
+        return;
+      }
+      const node = network.getNodeAt(event.pointer.DOM);
+      if(node === undefined || node.id === lastSelectedNode) {
+        return;
+      }
+      selectShortestPath(lastSelectedNode, node);
+    })
+    //network.stabilize(); 
+    // search function
+    document.getElementById("searchinput").addEventListener("focusin", (event) => {
+      document.getElementById("searchresults").style.display = "block";
+      document.getElementById("popup").style.display = "none";
+    })
+
+    document.getElementById("mynetwork").addEventListener("focusin", (event) => {
+      document.getElementById("searchresults").style.display = "none";
+      document.getElementById("popup").style.display = "none";
+    });
+    
+    document.getElementById("searchinput").addEventListener("keyup", (event) => {
+      const searchresults = document.getElementById("searchresults");
+      searchresults.innerHTML = "";
+      const query = event.target.value;
+      const queryLowerCase = query.toLowerCase();
+      if(query === "") return;
+      let matches = data.nodes.map((node) => {
+        // Steam ID match
+        if(node.id.toLowerCase() === queryLowerCase || node.id3.toLowerCase() === queryLowerCase || node.id1.toLowerCase() === queryLowerCase ) {
+          return {match: node.id, label: node.label, priority: 0, color: node.color.background};
+        }
+        // Exact current alias
+        if(node.label === query) {
+          return {match: node.id, label: node.label, priority: 1, color: node.color.background};
+        }
+        const lowerCaseLabel = node.label.toLowerCase();
+        // Case insensitive exact current alias
+        if(lowerCaseLabel === queryLowerCase) {
+          return {match: node.id, label: node.label, priority: 2, color: node.color.background};
+        }
+        // Exact previous alias
+        if(node.aliases.includes(query)) {
+          return {match: node.id, label: node.label, priority: 3, color: node.color.background};
+        }
+        const lowerCaseAliases = node.aliases.map(a => a.toLowerCase());
+        // Case insensitive exact previous alias
+        if(lowerCaseAliases.includes(queryLowerCase)) {
+          return {match: node.id, label: node.label, priority: 4, color: node.color.background};
+        }
+        // start of current alias
+        if(node.label.startsWith(query)) {
+          return {match: node.id, label: node.label, priority: 5, color: node.color.background};
+        }
+        // Case insensitive start of current alias
+        if(lowerCaseLabel.startsWith(queryLowerCase)) {
+          return {match: node.id, label: node.label, priority: 6, color: node.color.background};
+        }
+        // start of previous alias
+        if(node.aliases.some(a => a.startsWith(query))) {
+          return {match: node.id, label: node.label, priority: 7, color: node.color.background};
+        }
+        // case insensitive start of previous alias
+        if(lowerCaseAliases.some(a => a.startsWith(queryLowerCase))) {
+          return {match: node.id, label: node.label, priority: 8, color: node.color.background};
+        }
+        // Substring of current alias
+        if(node.label.includes(query)) {
+          return {match: node.id, label: node.label, priority: 9, color: node.color.background};
+        }
+        // case insensitive substring of current alias
+        if(lowerCaseLabel.includes(queryLowerCase)) {
+          return {match: node.id, label: node.label, priority: 10, color: node.color.background};
+        }
+        // substring of previous alias
+        if(node.aliases.some(a => a.includes(query))) {
+          return {match: node.id, label: node.label, priority: 11, color: node.color.background};
+        }
+        // case insensitive substring of previous alias
+        if(lowerCaseAliases.some(a => a.includes(queryLowerCase))) {
+          return {match: node.id, label: node.label, priority: 12, color: node.color.background};
+        }
+        return null;
+      }).filter(m => m !== null);
+      if(matches.length === 0) return;
+      let sortedMatches = matches.sort((m1, m2) => {
+        if(m1.priority !== m2.priority) return m1.priority - m2.priority;
+        if(m1.label !== m2.label) return m1.label > m2.label ? 1 : -1;
+        return m1.match > m2.match ? 1 : -1;
+      })
+      var string = "";
+      string += `<table style="width:100%">`
+      for(const m of sortedMatches) {
+        string += `<tr onclick="focusOn('${m.match}')">`
+        string += `<td style="color: ${m.color}; text-align: right; padding-right: 20px">${sanitizeString(m.label)}</td>`
+        string += `<td style="color: #aaaaaa; text-align: left; padding-left: 20px">${getFriendSpanHTML(m.match, 3)}</td>`
+        string += `</tr>`
+      }
+      string += "</table>";
+      searchresults.innerHTML = string;
+    })
+  }
+  // im not removing them
+  var lastSelectedNode = undefined;
+  function handleDrag(event) {
+   //var nodeID = network.getNodeAt(event.pointer.DOM);
+   lastSelectedNode = nodeID;
+   network.setSelection({
+   //  nodes: [nodeID]
+   })
+  }
+  function handleDragEnd(event) {
+   // if(event.nodes.length > 0) {
+   //   lastSelectedNode = undefined;
+  //    handleSelect(event);
+   // }
+  }
+  function handleSelect(event) {
+      var nodeID = network.getNodeAt(event.pointer.DOM);
+      if (nodeID === undefined || (event.nodes.length === 0 && event.edges.length > 0)) {
+        lastSelectedNode = undefined;
+        network.setSelection({
+          nodes: [],
+          edges: []
+        })
+        setNodeInformation(false);
+      } else {
+        var nodeEdges = network.nodesHandler.body.nodes[event.nodes[0]].edges;
+        lastSelectedNode = nodeID;
+        network.setSelection({
+          nodes: nodeEdges.flatMap(e => [e.fromId, e.toId]).concat([nodeID]),
+          edges: nodeEdges.map(e => e.id)
+        })
+        setNodeInformation(event.nodes[0]);
+      }
+  }
+  function getShortestPathNodes(start, end) {
+    const startMap = new Map([[start, null]]);
+    const endMap = new Map([[end, null]]);
+
+    let startNodesToProcess = [start];
+    let endNodesToProcess = [end];
+    let link = undefined;
+    let i = 1;
+    const updateMap = (nodeID, ourMap, theirMap) => {
+      const node = network.nodesHandler.body.nodes[nodeID];
+      let newNodes = []
+        for(const edge of node.edges) {
+          const otherNodeID = edge.fromId === nodeID ? edge.toId : edge.fromId;
+          if(ourMap.get(otherNodeID) === undefined) {
+            ourMap.set(otherNodeID, nodeID);
+            newNodes.push(otherNodeID);
+          }
+        }
+      return newNodes;
+    }
+    const getOutput = (treeMidID) => {
+      let output = [];
+      let start = [];
+      let end = []
+      for(let n = treeMidID; n !== undefined; n = startMap.get(n)) {
+        if(n !== null) {
+          output.unshift(n);
+        }
+      }
+      for(let n = endMap.get(treeMidID); n !== undefined; n = endMap.get(n)) {
+        if(n !== null) {
+          output.push(n);
+        }
+      }
+      return output;
+    }
+    while(startNodesToProcess.length > 0 || endNodesToProcess.length > 0) {
+      let newStartNodes = [];
+      let newEndNodes = [];
+      for(const nodeID of startNodesToProcess) {
+        newStartNodes.push(...updateMap(nodeID, startMap, endMap))
+      }
+      for(const nodeID of newStartNodes) {
+        if(endMap.get(nodeID) !== undefined) {
+          let output = [];
+          output.push(...getOutput(nodeID));
+          return output;
+        }
+      }
+      for(const nodeID of endNodesToProcess) {
+        newEndNodes.push(...updateMap(nodeID, endMap, startMap));
+      }
+      for(const nodeID of newEndNodes) {
+        if(startMap.get(nodeID) !== undefined) {
+          let output = [];
+          output.push(...getOutput(nodeID));
+          return output;
+        }
+      }
+      startNodesToProcess = newStartNodes;
+      endNodesToProcess = newEndNodes;
+      i++;
+    }
+    return null;
+  }
+  function selectShortestPath(start, end) {
+    const nodeIDs = getShortestPathNodes(start, end);
+    if(nodeIDs === null) {
+      return;
+    }
+    const edgeIDs = [];
+    for(let i = 0; i < nodeIDs.length - 1; i++) {
+      const node = network.nodesHandler.body.nodes[nodeIDs[i]];
+      const nextNode = network.nodesHandler.body.nodes[nodeIDs[i+1]];
+      const startNode = (node.edges.length <= nextNode.edges.length ? node : nextNode);
+      const endNode = (node.edges.length <= nextNode.edges.length ? nextNode : node);
+
+      const edge = startNode.edges.find(edge => {
+        return edge.fromId === endNode.id || edge.toId === endNode.id;
+      })
+      edgeIDs.push(edge.id);
+    }
+    network.setSelection({
+      nodes: nodeIDs,
+      edges: edgeIDs
+    })
+  }
+  function focusOn(nodeID) {
+    var nodeEdges = network.nodesHandler.body.nodes[nodeID].edges;
+    lastSelectedNode = nodeID;
+    network.setSelection({
+      nodes: nodeEdges.flatMap(e => [e.fromId, e.toId]).concat([nodeID]),
+      edges: nodeEdges.map(e => e.id)
+    })
+    setNodeInformation(nodeID);
+    network.focus(nodeID, {locked: false, scale: 2, animation: false, offset: {x: 0, y: 0}});
+  }
+  function getPriorityString(priority) {
+    switch (priority) {
+      case 0: return "EXACT-STEAMID"
+      case 1: return "EXACT-CURRENT-CASEMATCH"
+      case 2: return "EXACT-CURRENT-CASEDIFF"
+      case 3: return "EXACT-PREVIOUS-CASEMATCH"
+      case 4: return "EXACT-PREVIOUS-CASEDIFF"
+      case 5: return "STARTOF-CURRENT-CASEMATCH"
+      case 6: return "STARTOF-CURRENT-CASEDIFF"
+      case 7: return "STARTOF-PREVIOUS-CASEMATCH"
+      case 8: return "STARTOF-PREVIOUS-CASEDIFF"
+      case 9: return  "SUBSTRING-CURRENT-CASEMATCH"
+      case 10: return "SUBSTRING-CURRENT-CASEDIFF"
+      case 11: return "SUBSTRING-PREVIOUS-CASEMATCH"
+      case 12: return "SUBSTRING-PREVIOUS-CASEDIFF"
+    }
+  }
+  function setNodeInformation(nodeID) {
+    if(nodeID === false) {
+      document.getElementById('infodiv').style.display = 'none';
+      return;
+    }
+    document.getElementById('infodiv').style.display = 'inline';
+    var nodeOptions = network.nodesHandler.body.nodes[nodeID].options;
+    var edges = network.nodesHandler.body.nodes[nodeID].edges;
+    
+    var textElement = document.getElementById('infotext');
+    var string = "";
+    if (nodeOptions.id === "69") {
+    string += `<a href="../vids/roadblocks_e.mp4" target="_blank">${nodeOptions.label}</a>`;
+    string += `<p>SteamID64: 76561198312822034</p>`;
+    string += `<p>SteamID3: [U:1:352556306]</p>`;
+    string += `<p>SteamID1: STEAM_0:0:176278153</p>`;
+    string += `</p>`;
+    string += `<p> position: x ${nodeOptions.x}, y ${nodeOptions.y}`;
+    string += `<p>Aliases:\n`;
+    string += `<div style="max-height: min(600px, 40vh, 30vw); overflow-y: auto; padding-right: 25px"><span>`;
+    string += sanitizeString("\t" + nodeOptions.aliases.join("\n\t"));
+    string += `</span></div></p>`;
+    } else {
+    string += `<a href="https://steamcommunity.com/profiles/${nodeOptions.id}" target="_blank">${nodeOptions.label}</a>`;
+    string += `<p>SteamID64: ${nodeOptions.id}</p>`;
+    string += `<p>SteamID3: ${nodeOptions.id3}</p>`;
+    string += `<p>SteamID1: ${nodeOptions.id1}</p>`;
+    string += `</p>`;
+    string += `<p> position: x ${nodeOptions.x}, y ${nodeOptions.y}`;
+    string += `<p>Aliases:\n`;
+    string += `<div style="max-height: min(600px, 40vh, 30vw); overflow-y: auto; padding-right: 25px"><span>`;
+    string += sanitizeString("\t" + nodeOptions.aliases.join("\n\t"));
+    string += `</span></div></p>`;
+  }
+    textElement.innerHTML = string;
+  }
+  function sanitizeString(str) {
+    return str.replaceAll(/&/g, "&amp;").replaceAll(/</g, "&lt;").replaceAll(/>/g, "&gt;").replaceAll(/"/g, "&quot;").replaceAll(/'/g, "&#39;");
+  }
+  function getFriendSpanHTML(nodeID, spacingCount) {
+    var nodeOptions = network.nodesHandler.body.nodes[nodeID].options;
+    var edges = network.nodesHandler.body.nodes[nodeID].edges;
+    var cheaterFriends = getEdgePartnerTypeCount(nodeID, edges, "#ff3300");
+    var susFriends = getEdgePartnerTypeCount(nodeID, edges, "#ffff00");
+    var watchedFriends = getEdgePartnerTypeCount(nodeID, edges, "#ffffff");
+    var innocentFriends = getEdgePartnerTypeCount(nodeID, edges, "#33ff00") + getEdgePartnerTypeCount(nodeID, edges, "#00ffff");
+    let string = ""
+    string += `<span style="color: #ff3300">C: ${consistentSpacing(cheaterFriends, spacingCount)} </span>`
+    string += `<span style="color: #ffff00">S: ${consistentSpacing(susFriends, spacingCount)} </span>`
+    string += `<span style="color: #ffffff">W: ${consistentSpacing(watchedFriends, spacingCount)} </span>`
+    string += `<span style="color: #33ff00">I: ${consistentSpacing(innocentFriends, spacingCount)} </span>`
+    return string;
+  }
+  function consistentSpacing(string, max) {
+    for(let i = string.toString().length; i < max; i++) {
+      string += "&nbsp";
+    }
+    return string;
+  }
+  function getEdgePartnerTypeCount(nodeID, edges, type) {
+    return edges.filter(e => {
+      let oppositeNode = e.fromId === nodeID ? e.to : e.from;
+      return oppositeNode.options.color.background === type;
+    }).length;
+  }
+</script>
+
+    <style type="text/css" media="screen">
+        html, body, .maindiv, svg { width: 100%; height: 100%; background-color: black; overflow: hidden; overflow-x: hidden}
+        svg {
+          shape-rendering: optimizeSpeed;
+          text-rendering: optimizeSpeed;
+        }
+        canvas {
+          width: 100%; height: 100%;
+        }
+        a:link {
+          color: cyan;
+          background-color: transparent;
+          text-decoration: none;
+        }
+        td {
+          width: 50%;
+          overflow:hidden;
+          white-space: pre-line;
+          color: white;
+          font-family: 'Courier New', Courier, monospace;
+        }
+        a:visited {
+          color: pink;
+          background-color: transparent;
+          text-decoration: none;
+        }
+
+        a:hover {
+          color: lime;
+          background-color: transparent;
+          text-decoration: none;
+        }
+
+        a:active {
+          color: yellow;
+          background-color: transparent;
+          text-decoration: none;
+        }
+        p, span, ul, li, a {
+          white-space: pre-line;
+          color: white;
+          text-align: left;
+          font-family: 'Courier New', Courier, monospace;
+        }
+        .progress-bar {
+          position: absolute;
+          display: none;
+          top: 45%;
+          bottom: 45%;
+          left: 30%;
+          right: 30%;
+          width: 40%;
+          height: 10%;
+          z-index: 10;
+        }
+        
+        #searchdiv {
+          z-index: 20;
+          position:absolute;
+          padding: 10px;
+          text-align: center;
+          left: 0;
+          right: 0;
+          margin-left: auto;
+          margin-right: auto;
+          max-width: max-content;
+          min-width: min(410px, 90%);
+          overflow-y: auto;
+          justify-content: center;
+          top: 10px;
+          background-color: rgba(0, 0, 0, 0.8);
+        }
+        #infodiv {
+          z-index: 10;
+          position: absolute;
+          padding: 10px;
+          left: 30px;
+          bottom: 10px;
+          background-color: rgba(0, 0, 0, 0.8);
+        }
+        .close {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          font-size: 20px;
+          font-weight: bold;
+          color: #ccc;
+          cursor: pointer;
+        }
+    </style>
+</head>
+<body  onload='main()'> 
+  <div class="maindiv" id='mynetwork'>
+  </div>
+  <div id="searchdiv">
+    <input style="width: min(400px, 80%); margin: 5px" id="searchinput" type="text" placeholder="Search by SteamID or alias..."/><button onclick="openPopup()">About</button>
+    <div id="searchresults" style="display: none; max-height: 325px; overflow-y: auto; padding-left: 10px; padding-right: 10px"></div>
+    <div id="popup" style="display: block; overflow-y: auto; margin-left: auto; margin-right: auto; max-height: 90vh; max-width: min(90vw, 650px);">
+      <span class="close" onclick="closePopup()">×</span> 
+      <p style="text-align:left;">  
+      Welcome to the cheater database for team fortress 2. this was made by a player that lives in ur pc and toggles cheats when someone is cheating and stream snipes. so yeah pazer users ur welcomed to skid this shit<br>
+      <span style="color:#ff3300;font-weight:bold">Red nodes</span> 100% cheating<br>
+      <span style="color:#ffff00;font-weight:bold">Yellow nodes</span> cheater with pasted cheats<br>
+      <span style="color:#ffffff;font-weight:bold">White nodes</span> pedo cheater <br>
+      <span style="color:#33ff00;font-weight:bold">Green nodes</span> newcomer cheater <br>
+      <span style="color:#00ffff;font-weight:bold">The cyan node</span> big namer cheater <br>
+      <span style="font-weight:bold">Stars ⭐</span> = known alias or custom name<br>
+      <hr>
+      <br>
+        <a href="../vids/click_me.mp4">hover me.</a><br><br>
+      <span style="font-weight:bold">Disclaimers:</span> <ul>
+      <li>this shit is retarded</li>
+      <li>i only update the database when i see a cheater</li>
+      <li>6 stack counts</li>
+      <li>its not 100%</li>
+      <li>dont harass them. only harass them if they toxic</li>
+      <li>secrets around</li>
+      <li>also github doesnt allow u to ip grab. only if u fucking make a ip grabber</li>
+      <li>also theres few bugs but im not fixing them</li>
+      </ul>
+      <span style="font-weight:bold">screenshots</span> <ul>
+        <img src="../screenshotterinos/sulkan.PNG" alt="sulkan wants big namer status.. wish granted">
+      </ul>
+      </p>
+    </div>
+    <script>
+      function openPopup() {
+        document.getElementById("searchresults").style.display = "none";
+        document.getElementById("popup").style.display = "block";
+      }
+      
+      function closePopup() {
+        document.getElementById("popup").style.display = "none";
+      }
+    </script>
+  </div>
+  <div id="infodiv">
+    <p id="infotext"></p>
+  </div>
+  <progress class="progress-bar" id="loadingbar" value="0" max="10000" ellipse></progress>
+</body>
+</html>
