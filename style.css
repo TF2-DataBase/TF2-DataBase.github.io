@@ -1,0 +1,555 @@
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: radial-gradient(ellipse at bottom, #0d1d31 0%, #0c0d13 100%);
+  overflow: hidden;
+}
+
+.stars {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 10%;
+  transform: rotate(-45deg);
+}
+
+.star {
+  --star-color: var(--primary-color);
+  --star-tail-length: 6em;
+  --star-tail-height: 2px;
+  --star-width: calc(var(--star-tail-length) / 6);
+  --fall-duration: 9s;
+  --tail-fade-duration: var(--fall-duration);
+  position: absolute;
+  top: var(--top-offset);
+  left: 0;
+  width: var(--star-tail-length);
+  height: var(--star-tail-height);
+  color: var(--star-color);
+  background: linear-gradient(45deg, currentColor, transparent);
+  border-radius: 50%;
+  filter: drop-shadow(0 0 6px currentColor);
+  transform: translate3d(104em, 0, 0);
+  animation: fall var(--fall-duration) var(--fall-delay) linear infinite, tail-fade var(--tail-fade-duration) var(--fall-delay) ease-out infinite;
+}
+@media screen and (max-width: 750px) {
+  .star {
+    animation: fall var(--fall-duration) var(--fall-delay) linear infinite;
+  }
+}
+/* no way i spamming 1 2 3 4 5 6 etc!!! */
+.star:nth-child(1) {
+  --star-tail-length: 6.47em;
+  --top-offset: 37.99vh;
+  --fall-duration: 8.499s;
+  --fall-delay: 6.502s;
+}
+.star:nth-child(2) {
+  --star-tail-length: 5.53em;
+  --top-offset: 90.44vh;
+  --fall-duration: 8.817s;
+  --fall-delay: 9.069s;
+}
+.star:nth-child(3) {
+  --star-tail-length: 5.84em;
+  --top-offset: 86.92vh;
+  --fall-duration: 10.245s;
+  --fall-delay: 9.51s;
+}
+.star:nth-child(4) {
+  --star-tail-length: 6.42em;
+  --top-offset: 45.99vh;
+  --fall-duration: 6.366s;
+  --fall-delay: 1.504s;
+}
+.star:nth-child(5) {
+  --star-tail-length: 7.04em;
+  --top-offset: 63.18vh;
+  --fall-duration: 10.733s;
+  --fall-delay: 0.576s;
+}
+.star:nth-child(6) {
+  --star-tail-length: 5.05em;
+  --top-offset: 68.24vh;
+  --fall-duration: 6.537s;
+  --fall-delay: 7.628s;
+}
+.star:nth-child(7) {
+  --star-tail-length: 5.2em;
+  --top-offset: 91.56vh;
+  --fall-duration: 11.123s;
+  --fall-delay: 2.065s;
+}
+.star:nth-child(8) {
+  --star-tail-length: 5.02em;
+  --top-offset: 45.59vh;
+  --fall-duration: 6.344s;
+  --fall-delay: 9.814s;
+}
+.star:nth-child(9) {
+  --star-tail-length: 7.25em;
+  --top-offset: 3.66vh;
+  --fall-duration: 10.217s;
+  --fall-delay: 8.203s;
+}
+.star:nth-child(10) {
+  --star-tail-length: 6.2em;
+  --top-offset: 51.82vh;
+  --fall-duration: 8.679s;
+  --fall-delay: 4.781s;
+}
+.star:nth-child(11) {
+  --star-tail-length: 7.06em;
+  --top-offset: 21.2vh;
+  --fall-duration: 6.691s;
+  --fall-delay: 6.156s;
+}
+.star:nth-child(12) {
+  --star-tail-length: 6.8em;
+  --top-offset: 90.86vh;
+  --fall-duration: 9.948s;
+  --fall-delay: 5.721s;
+}
+.star:nth-child(13) {
+  --star-tail-length: 7.49em;
+  --top-offset: 74.79vh;
+  --fall-duration: 9.357s;
+  --fall-delay: 3.248s;
+}
+.star:nth-child(14) {
+  --star-tail-length: 6.67em;
+  --top-offset: 54.09vh;
+  --fall-duration: 7.311s;
+  --fall-delay: 8.309s;
+}
+.star:nth-child(15) {
+  --star-tail-length: 6.28em;
+  --top-offset: 42.54vh;
+  --fall-duration: 8.098s;
+  --fall-delay: 7.871s;
+}
+.star:nth-child(16) {
+  --star-tail-length: 6.87em;
+  --top-offset: 33.88vh;
+  --fall-duration: 7.942s;
+  --fall-delay: 7.939s;
+}
+.star:nth-child(17) {
+  --star-tail-length: 5.35em;
+  --top-offset: 49.42vh;
+  --fall-duration: 11.721s;
+  --fall-delay: 4.857s;
+}
+.star:nth-child(18) {
+  --star-tail-length: 5.49em;
+  --top-offset: 3.82vh;
+  --fall-duration: 8.949s;
+  --fall-delay: 4.295s;
+}
+.star:nth-child(19) {
+  --star-tail-length: 5.91em;
+  --top-offset: 73.91vh;
+  --fall-duration: 7.444s;
+  --fall-delay: 0.805s;
+}
+.star:nth-child(20) {
+  --star-tail-length: 6.54em;
+  --top-offset: 96.68vh;
+  --fall-duration: 10.427s;
+  --fall-delay: 4.914s;
+}
+.star:nth-child(21) {
+  --star-tail-length: 5.23em;
+  --top-offset: 12.92vh;
+  --fall-duration: 9.486s;
+  --fall-delay: 0.598s;
+}
+.star:nth-child(22) {
+  --star-tail-length: 5.67em;
+  --top-offset: 27.21vh;
+  --fall-duration: 7.912s;
+  --fall-delay: 1.036s;
+}
+.star:nth-child(23) {
+  --star-tail-length: 5.6em;
+  --top-offset: 40.44vh;
+  --fall-duration: 9.518s;
+  --fall-delay: 6.446s;
+}
+.star:nth-child(24) {
+  --star-tail-length: 7.44em;
+  --top-offset: 43.39vh;
+  --fall-duration: 6.565s;
+  --fall-delay: 5.191s;
+}
+.star:nth-child(25) {
+  --star-tail-length: 5.88em;
+  --top-offset: 87.92vh;
+  --fall-duration: 6.219s;
+  --fall-delay: 4.391s;
+}
+.star:nth-child(26) {
+  --star-tail-length: 5.79em;
+  --top-offset: 59.62vh;
+  --fall-duration: 7.322s;
+  --fall-delay: 0.455s;
+}
+.star:nth-child(27) {
+  --star-tail-length: 7.01em;
+  --top-offset: 82.15vh;
+  --fall-duration: 11.877s;
+  --fall-delay: 9.93s;
+}
+.star:nth-child(28) {
+  --star-tail-length: 5.28em;
+  --top-offset: 60.14vh;
+  --fall-duration: 10.815s;
+  --fall-delay: 0.402s;
+}
+.star:nth-child(29) {
+  --star-tail-length: 6.42em;
+  --top-offset: 11.86vh;
+  --fall-duration: 9.946s;
+  --fall-delay: 7.621s;
+}
+.star:nth-child(30) {
+  --star-tail-length: 6.5em;
+  --top-offset: 65.5vh;
+  --fall-duration: 9.641s;
+  --fall-delay: 5.738s;
+}
+.star:nth-child(31) {
+  --star-tail-length: 5.5em;
+  --top-offset: 21.63vh;
+  --fall-duration: 11.392s;
+  --fall-delay: 1.557s;
+}
+.star:nth-child(32) {
+  --star-tail-length: 5.37em;
+  --top-offset: 30.88vh;
+  --fall-duration: 9.736s;
+  --fall-delay: 7.267s;
+}
+.star:nth-child(33) {
+  --star-tail-length: 5.32em;
+  --top-offset: 19.21vh;
+  --fall-duration: 8.157s;
+  --fall-delay: 5.3s;
+}
+.star:nth-child(34) {
+  --star-tail-length: 5.69em;
+  --top-offset: 85.61vh;
+  --fall-duration: 6.806s;
+  --fall-delay: 1.321s;
+}
+.star:nth-child(35) {
+  --star-tail-length: 6.4em;
+  --top-offset: 68.96vh;
+  --fall-duration: 6.453s;
+  --fall-delay: 1.033s;
+}
+.star:nth-child(36) {
+  --star-tail-length: 6.78em;
+  --top-offset: 55.23vh;
+  --fall-duration: 6.392s;
+  --fall-delay: 0.243s;
+}
+.star:nth-child(37) {
+  --star-tail-length: 5.9em;
+  --top-offset: 49.32vh;
+  --fall-duration: 9.257s;
+  --fall-delay: 5.313s;
+}
+.star:nth-child(38) {
+  --star-tail-length: 5.97em;
+  --top-offset: 26.4vh;
+  --fall-duration: 11.356s;
+  --fall-delay: 9.027s;
+}
+.star:nth-child(39) {
+  --star-tail-length: 6.63em;
+  --top-offset: 57.01vh;
+  --fall-duration: 10.785s;
+  --fall-delay: 9.858s;
+}
+.star:nth-child(40) {
+  --star-tail-length: 6.86em;
+  --top-offset: 25.49vh;
+  --fall-duration: 8.51s;
+  --fall-delay: 5.293s;
+}
+.star:nth-child(41) {
+  --star-tail-length: 5.16em;
+  --top-offset: 69.99vh;
+  --fall-duration: 10.151s;
+  --fall-delay: 6.57s;
+}
+.star:nth-child(42) {
+  --star-tail-length: 6.59em;
+  --top-offset: 55.68vh;
+  --fall-duration: 7s;
+  --fall-delay: 6.874s;
+}
+.star:nth-child(43) {
+  --star-tail-length: 7.03em;
+  --top-offset: 22.18vh;
+  --fall-duration: 9.576s;
+  --fall-delay: 5.167s;
+}
+.star:nth-child(44) {
+  --star-tail-length: 6.39em;
+  --top-offset: 97.45vh;
+  --fall-duration: 11.067s;
+  --fall-delay: 3.112s;
+}
+.star:nth-child(45) {
+  --star-tail-length: 7.24em;
+  --top-offset: 33.56vh;
+  --fall-duration: 6.418s;
+  --fall-delay: 0.023s;
+}
+.star:nth-child(46) {
+  --star-tail-length: 6.47em;
+  --top-offset: 74.72vh;
+  --fall-duration: 6.308s;
+  --fall-delay: 6.996s;
+}
+.star:nth-child(47) {
+  --star-tail-length: 5.53em;
+  --top-offset: 6.46vh;
+  --fall-duration: 7.951s;
+  --fall-delay: 7.292s;
+}
+.star:nth-child(48) {
+  --star-tail-length: 6.19em;
+  --top-offset: 37.09vh;
+  --fall-duration: 7.971s;
+  --fall-delay: 9.717s;
+}
+.star:nth-child(49) {
+  --star-tail-length: 5.35em;
+  --top-offset: 0.64vh;
+  --fall-duration: 8.032s;
+  --fall-delay: 9.718s;
+}
+.star:nth-child(50) {
+  --star-tail-length: 7.06em;
+  --top-offset: 89.75vh;
+  --fall-duration: 7.264s;
+  --fall-delay: 2.901s;
+}
+.star::before, .star::after {
+  position: absolute;
+  content: "";
+  top: 0;
+  left: calc(var(--star-width) / -2);
+  width: var(--star-width);
+  height: 100%;
+  background: linear-gradient(45deg, transparent, currentColor, transparent);
+  border-radius: inherit;
+  animation: blink 2s linear infinite;
+}
+.star::before {
+  transform: rotate(45deg);
+}
+.star::after {
+  transform: rotate(-45deg);
+}
+
+@keyframes fall {
+  to {
+    transform: translate3d(-30em, 0, 0);
+  }
+}
+@keyframes tail-fade {
+  0%, 50% {
+    width: var(--star-tail-length);
+    opacity: 1;
+  }
+  70%, 80% {
+    width: 0;
+    opacity: 0.4;
+  }
+  100% {
+    width: 0;
+    opacity: 0;
+  }
+}
+@keyframes blink {
+  50% {
+    opacity: 0.6;
+  }
+}
+.container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+}
+.buttons {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+.texts {
+  margin: 0;
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 20%;
+}
+.texthomepage {
+  color: white;
+  font-family: Arial, sans-serif;
+  position: relative;
+  font-size: 350%;
+  text-align: center;
+}
+.text2ndhomepage {
+  color: white;
+  font-family: Arial, sans-serif;
+  position: relative;
+  font-size: 250%;
+  text-align: center;
+}
+.gotocheaterbutton {
+  color: white;
+  position: relative;
+  font-size: 170%;
+  font-family: Arial, sans-serif;
+  background-color: transparent;
+  border-color: transparent;
+
+}
+
+.gotocheaterbutton::after, .gotocheaterbutton::before {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 20%;
+  height: 20%;
+  border: 3px solid;
+  transition: all 0.6s ease;
+  border-radius: 2px;
+}
+.gotocheaterbutton::after {
+  bottom: 0;
+  right: 0;
+  border-top-color: transparent;
+  border-left-color: transparent;
+  border-bottom-color: white;
+  border-right-color: white;
+}
+.gotocheaterbutton::before {
+  top: 0;
+  left: 0;
+  border-bottom-color: transparent;
+  border-right-color: transparent;
+  border-top-color: white;
+  border-left-color: white;
+}
+.gotocheaterbutton:hover:after, .gotocheaterbutton:hover:before {
+  border-bottom-color: white;
+  border-right-color: white;
+  border-top-color: white;
+  border-left-color: white;
+  width: 100%;
+  height: 100%;
+}
+
+.gotoyoutubebutton {
+  color: white;
+  position: relative;
+  font-size: 170%;
+  font-family: Arial, sans-serif;
+  background-color: transparent;
+  border-color: transparent;
+}
+
+.gotoyoutubebutton::after, .gotoyoutubebutton::before {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 20%;
+  height: 20%;
+  border: 3px solid;
+  transition: all 0.6s ease;
+  border-radius: 2px;
+}
+.gotoyoutubebutton::after {
+  bottom: 0;
+  right: 0;
+  border-top-color: transparent;
+  border-left-color: transparent;
+  border-bottom-color: white;
+  border-right-color: white;
+}
+.gotoyoutubebutton::before {
+  top: 0;
+  left: 0;
+  border-bottom-color: transparent;
+  border-right-color: transparent;
+  border-top-color: white;
+  border-left-color: white;
+}
+.gotoyoutubebutton:hover:after, .gotoyoutubebutton:hover:before {
+  border-bottom-color: white;
+  border-right-color: white;
+  border-top-color: white;
+  border-left-color: white;
+  width: 100%;
+  height: 100%;
+}
+
+.gotobotsbutton {
+  color: white;
+  position: relative;
+  font-size: 170%;
+  font-family: Arial, sans-serif;
+  background-color: transparent;
+  border-color: transparent;
+}
+
+.gotobotsbutton::after, .gotobotsbutton::before {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 20%;
+  height: 20%;
+  border: 3px solid;
+  transition: all 0.6s ease;
+  border-radius: 2px;
+}
+.gotobotsbutton::after {
+  bottom: 0;
+  right: 0;
+  border-top-color: transparent;
+  border-left-color: transparent;
+  border-bottom-color: white;
+  border-right-color: white;
+}
+.gotobotsbutton::before {
+  top: 0;
+  left: 0;
+  border-bottom-color: transparent;
+  border-right-color: transparent;
+  border-top-color: white;
+  border-left-color: white;
+}
+.gotobotsbutton:hover:after, .gotobotsbutton:hover:before {
+  border-bottom-color: white;
+  border-right-color: white;
+  border-top-color: white;
+  border-left-color: white;
+  width: 100%;
+  height: 100%;
+}
